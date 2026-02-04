@@ -1,0 +1,8 @@
+Django>=5.2.10
+djangorestframework>=3.14.0
+djangorestframework-simplejwt>=5.2.0
+django-cors-headers>=4.0.0
+python-dotenv>=1.0.0
+# Optional / commonly useful
+gunicorn>=22.0.0
+# Add any other backend dependencies here

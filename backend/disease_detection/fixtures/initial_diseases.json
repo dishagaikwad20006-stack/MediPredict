@@ -1,0 +1,35 @@
+[
+  {
+    "model": "disease_detection.disease",
+    "pk": 1,
+    "fields": {
+      "name": "Influenza",
+      "description": "A common viral infection causing fever, chills, muscle aches, cough.",
+      "symptoms": "fever,cough,sore throat,runny nose,body ache",
+      "medications": "antiviral medication,paracetamol,ibuprofen",
+      "remedies": "rest,fluids,warm compress"
+    }
+  },
+  {
+    "model": "disease_detection.disease",
+    "pk": 2,
+    "fields": {
+      "name": "Common Cold",
+      "description": "Mild viral infection of the nose and throat.",
+      "symptoms": "runny nose,sore throat,sneezing,cough",
+      "medications": "decongestant,antihistamine,paracetamol",
+      "remedies": "rest,hydration,steam inhalation"
+    }
+  },
+  {
+    "model": "disease_detection.disease",
+    "pk": 3,
+    "fields": {
+      "name": "Migraine",
+      "description": "Neurological condition with intense headaches and sensitivity to light.",
+      "symptoms": "headache,nausea,light sensitivity",
+      "medications": "triptans,antiemetic,acetaminophen",
+      "remedies": "dark room,rest,cold compress"
+    }
+  }
+]
