@@ -11,12 +11,34 @@ body.light, .light {
   background: linear-gradient(135deg, #f7faff, #e0e7ef 80%);
   color: #232526;
 }
+/* Animated background for Home */
+.animated-bg {
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(120deg, #0f2027 0%, #2c5364 40%, #00bcd4 100%);
+  background-size: 200% 200%;
+  animation: gradientMove 10s ease-in-out infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .glass-bg {
   background: rgba(30, 40, 60, 0.85);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border-radius: 18px;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.27);
+  border: 1.5px solid rgba(0,230,255,0.18);
+  transition: box-shadow 0.3s, border 0.3s;
+}
+.glass-bg:hover {
+  box-shadow: 0 12px 40px 0 rgba(0,230,255,0.18);
+  border: 1.5px solid #00e6ff;
+}
 }
 .login-bg {
   min-height: 100vh;

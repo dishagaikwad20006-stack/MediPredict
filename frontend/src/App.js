@@ -14,6 +14,8 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import LoginDialog from './components/LoginDialog';
 import Home from './pages/Home';
 import Diseases from './pages/Diseases';
+import Medicines from './pages/Medicines';
+import About from './pages/About';
 import axios from 'axios';
 
 function App(){
@@ -59,7 +61,10 @@ function App(){
             🩺 MediPredict
           </Typography>
           <Button color="inherit" component={Link} to="/">Home</Button>
+          <Button color="inherit" component={Link} to="/diagnose">Diagnose</Button>
+          <Button color="inherit" component={Link} to="/medicines">Medicines</Button>
           <Button color="inherit" component={Link} to="/diseases">Diseases</Button>
+          <Button color="inherit" component={Link} to="/about">About</Button>
           {user ? (
             <>
               <Typography variant="body2" sx={{ mx: 2 }}>Welcome, {user.username}</Typography>
@@ -77,7 +82,10 @@ function App(){
         <Container maxWidth="lg" sx={{ py:4 }}>
             <Routes>
               <Route path="/" element={<Home user={user} />} />
+              <Route path="/diagnose" element={<Home user={user} />} />
+              <Route path="/medicines" element={<Medicines />} />
               <Route path="/diseases" element={<Diseases />} />
+              <Route path="/about" element={<About />} />
             </Routes>
         </Container>
         <LoginDialog open={loginOpen} onClose={()=>setLoginOpen(false)} onLogin={(u)=>setUser(u)} />

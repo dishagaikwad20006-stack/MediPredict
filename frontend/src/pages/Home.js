@@ -1,105 +1,129 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, Chip, Card, CardContent, Typography, LinearProgress, Stack, Autocomplete, TextField, Paper, Grid, Container } from '@mui/material';
-import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
-import MedicationIcon from '@mui/icons-material/Medication';
-import SpaIcon from '@mui/icons-material/Spa';
+
+import React from 'react';
+import { Box, Button, Card, CardContent, Typography, Checkbox, FormControlLabel, Paper, Grid, Container, Divider } from '@mui/material';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+// Symptom categories for UI
+const symptomCategories = [
+  {
+    label: 'General Symptoms',
+    symptoms: ['Fever', 'Body Pain', 'Fatigue', 'Headache']
+  },
+  {
+    label: 'Respiratory Symptoms',
+    symptoms: ['Cough', 'Runny Nose', 'Sore Throat', 'Shortness of Breath']
+  },
+  {
+    label: 'Digestive Symptoms',
+    symptoms: ['Nausea', 'Vomiting', 'Diarrhea', 'Stomach Pain']
+  },
+  {
+    label: 'Other Symptoms',
+    symptoms: ['Skin Rash', 'Dizziness', 'Chest Pain', 'Allergy']
+  }
+];
 
-export default function Home({ user }) {
-  const [symptoms, setSymptoms] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [predictions, setPredictions] = useState([]);
+export default function Home() {
+  const [selected, setSelected] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [prediction, setPrediction] = React.useState(null);
 
-  useEffect(() => {
-    axios.get('/api/diseases/').then(r => {
-      const all = new Set();
-      (r.data || []).forEach(d => (d.symptom_list || []).forEach(s => all.add(s)));
-      setSuggestions(Array.from(all));
-    }).catch(() => setSuggestions([]));
-  }, []);
+  const handleToggle = (symptom) => {
+    setSelected((prev) =>
+      prev.includes(symptom)
+        ? prev.filter((s) => s !== symptom)
+        : [...prev, symptom]
+    );
+  };
 
   const handleDiagnose = async () => {
-    if (!symptoms.length) return;
-    setLoading(true); setPredictions([]);
+    if (!selected.length) return;
+    setLoading(true); setPrediction(null);
     try {
-      const res = await axios.post('/api/simple_predict/', { symptoms });
-      // The new endpoint returns a prediction object with details
-      setPredictions([res.data.prediction]);
+      const res = await axios.post('/api/simple_predict/', { symptoms: selected });
+      setPrediction(res.data.prediction || res.data);
     } catch (e) {
-      // ignore
+      setPrediction({ disease: 'Error', description: 'Could not get prediction.' });
     }
     setLoading(false);
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', py: 6 }}>
-      <Container maxWidth="sm">
-        <Paper elevation={6} sx={{ p: { xs: 2, md: 4 }, borderRadius: 4, background: 'linear-gradient(135deg, #2196F3 0%, #00BCD4 100%)', color: 'white', boxShadow: 6 }}>
-          <Typography variant="h3" align="center" sx={{ fontWeight: 700, mb: 2, color: 'white', fontSize: { xs: '2rem', md: '2.5rem' } }}>
-            Welcome to MediPredict{user ? `, ${user.username}` : ''}
+    <Box className="animated-bg" sx={{ minHeight: '100vh', py: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {/* Header and Nav */}
+      <Box sx={{ width: '100%', mb: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', px: 4, py: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: '#00e6ff', letterSpacing: 1 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <span role="img" aria-label="stethoscope">🩺</span> Diagnostic
+            </span>
           </Typography>
-          <Typography variant="body1" align="center" sx={{ mb: 3, color: 'white', fontSize: { xs: '1rem', md: '1.15rem' } }}>
-            Enter your symptoms below and receive AI-powered disease predictions along with recommended medications and home remedies.
-          </Typography>
-          <Box sx={{ mt: 2 }}>
-            <Autocomplete
-              multiple
-              freeSolo
-              options={suggestions}
-              value={symptoms}
-              onChange={(e, v) => setSymptoms(v)}
-              renderInput={(params) => (
-                <TextField {...params} label="Describe your symptoms" placeholder="e.g. fever, cough" variant="outlined" fullWidth sx={{ fontSize: '1.2rem', minHeight: 56, '.MuiInputBase-input': { fontSize: '1.2rem', py: 2 } }} />
-              )}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip variant="filled" label={option} {...getTagProps({ index })} key={index} sx={{ bgcolor: '#fff', color: '#1976d2', fontWeight: 500 }} />
-                ))
-              }
-            />
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
-              <Button variant="contained" onClick={() => setSymptoms([])} sx={{ bgcolor: 'white', color: '#1976d2', fontWeight: 700, minWidth: 120, boxShadow: 2, '&:hover': { bgcolor: '#e3f2fd' } }}>Clear</Button>
-              <Button variant="contained" onClick={handleDiagnose} disabled={loading || !symptoms.length} sx={{ bgcolor: '#1976d2', color: 'white', fontWeight: 700, minWidth: 160, boxShadow: 2, opacity: loading || !symptoms.length ? 0.7 : 1, '&:hover': { bgcolor: '#1565c0' } }}>
-                {loading ? 'Analyzing...' : 'Get Diagnosis'}
-              </Button>
+        </Box>
+      </Box>
+      {/* Main Card */}
+      <Container maxWidth="md">
+        <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+          <Paper elevation={6} className="glass-bg" sx={{ p: { xs: 2, md: 4 }, borderRadius: 4, color: 'white', boxShadow: 6, backdropFilter: 'blur(16px) saturate(180%)', background: 'rgba(30, 40, 60, 0.85)' }}>
+            <Typography variant="h4" align="center" sx={{ fontWeight: 700, mb: 2, color: 'white', letterSpacing: 1, textShadow: '0 2px 16px #00bcd4' }}>
+              Select Your Symptoms
+            </Typography>
+            <Typography variant="body1" align="center" sx={{ mb: 3, color: 'white' }}>
+              Enter the symptoms you’re experiencing
+            </Typography>
+            <Divider sx={{ mb: 3, bgcolor: '#00e6ff', opacity: 0.2 }} />
+            <Grid container spacing={3}>
+              {symptomCategories.map((cat) => (
+                <Grid item xs={12} sm={6} md={3} key={cat.label}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1, color: '#00e6ff' }}>{cat.label}</Typography>
+                  {cat.symptoms.map((sym) => (
+                    <FormControlLabel
+                      key={sym}
+                      control={<Checkbox checked={selected.includes(sym)} onChange={() => handleToggle(sym)} sx={{ color: '#00e6ff' }} />}
+                      label={<span style={{ color: 'white' }}>{sym}</span>}
+                    />
+                  ))}
+                </Grid>
+              ))}
+            </Grid>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.97 }}>
+                <Button variant="contained" onClick={handleDiagnose} disabled={loading || !selected.length} sx={{ bgcolor: '#1976d2', color: 'white', fontWeight: 700, minWidth: 200, boxShadow: 2, borderRadius: 99, fontSize: '1.1rem', opacity: loading || !selected.length ? 0.7 : 1, '&:hover': { bgcolor: '#00e6ff', color: '#232526' } }}>
+                  {loading ? 'Analyzing...' : 'Predict Disease'}
+                </Button>
+              </motion.div>
             </Box>
-          </Box>
-        </Paper>
-
-        {predictions.length > 0 && (
-          <Stack spacing={2} sx={{ mt:3 }}>
-            {predictions.map((p, i) => (
-              <motion.div key={p.disease+i} initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{ delay: i * 0.1 }}>
-                <Card elevation={4} sx={{ borderRadius: 3, '&:hover': { boxShadow: 6 } }}>
-                  <CardContent sx={{ p: 3 }}>
-                    <Box sx={{display:'flex',justifyContent:'center',alignItems:'center', mb: 2}}>
-                      <LocalHospitalIcon color="primary" sx={{ mr: 1 }} />
-                      <Typography variant="h6">{p.disease}</Typography>
-                    </Box>
-                    <Typography sx={{mt:1, mb: 2}}>{p.description}</Typography>
-                    <Box sx={{mt:2}}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <MedicationIcon color="secondary" sx={{ mr: 1 }} />
-                        <Typography variant="subtitle2">Suggested Medicines</Typography>
+            {prediction && (
+              <Box sx={{ mt: 4 }}>
+                <Card elevation={4} sx={{ borderRadius: 3, background: '#1e283c', color: 'white' }}>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ mb: 1 }}>{prediction.disease}</Typography>
+                    <Typography sx={{ mb: 2 }}>{prediction.description}</Typography>
+                    {prediction.medications && (
+                      <Box sx={{ mb: 1 }}>
+                        <Typography variant="subtitle2">Suggested Medicines:</Typography>
+                        <ul style={{ margin: 0, paddingLeft: 18 }}>{prediction.medications.map((m) => <li key={m}>{m}</li>)}</ul>
                       </Box>
-                      <Box sx={{display:'flex',gap:1,flexWrap:'wrap',mt:1}}>{(p.medications||[]).map(m=><Chip key={m} label={m} color="primary" variant="outlined" />)}</Box>
-                    </Box>
-                    <Box sx={{mt:2}}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <SpaIcon color="success" sx={{ mr: 1 }} />
-                        <Typography variant="subtitle2">Suggested Remedies</Typography>
+                    )}
+                    {prediction.remedies && (
+                      <Box>
+                        <Typography variant="subtitle2">Suggested Remedies:</Typography>
+                        <ul style={{ margin: 0, paddingLeft: 18 }}>{prediction.remedies.map((r) => <li key={r}>{r}</li>)}</ul>
                       </Box>
-                      <Box sx={{display:'flex',gap:1,flexWrap:'wrap',mt:1}}>{(p.remedies||[]).map(r=><Chip key={r} label={r} variant="outlined" />)}</Box>
-                    </Box>
+                    )}
                   </CardContent>
                 </Card>
-              </motion.div>
-            ))}
-          </Stack>
-        )}
+              </Box>
+            )}
+          </Paper>
+        </motion.div>
       </Container>
+      {/* Footer */}
+      <Box sx={{ mt: 8, mb: 2, textAlign: 'center', opacity: 0.7 }}>
+        <Typography variant="body2" sx={{ fontFamily: 'Orbitron, Segoe UI, Arial', letterSpacing: 2, color: '#00e6ff' }}>
+          ⚠️ This system provides preliminary guidance only. Consult a doctor for an accurate diagnosis.<br />
+          © 2025 Home Diagnostic. All Rights Reserved.
+        </Typography>
+      </Box>
     </Box>
   );
 }
