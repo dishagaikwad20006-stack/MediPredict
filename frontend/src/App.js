@@ -3,9 +3,6 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -19,15 +16,14 @@ import About from './pages/About';
 import axios from 'axios';
 
 function App(){
-  const [mode, setMode] = useState(() => localStorage.getItem('medipredict_mode') || 'light');
   const theme = useMemo(()=> createTheme({ 
     palette:{
-      mode, 
+      mode: 'dark',
       primary:{main:'#2196f3'}, 
       secondary:{main:'#4caf50'},
       background: {
-        default: mode === 'light' ? '#f5f5f5' : '#121212',
-        paper: mode === 'light' ? '#ffffff' : '#1e1e1e'
+        default: '#121212',
+        paper: '#1e1e1e'
       }
     }, 
     shape:{borderRadius:16},
@@ -36,8 +32,7 @@ function App(){
       h4: { fontWeight: 600 },
       h5: { fontWeight: 500 }
     }
-  }), [mode]);
-  useEffect(()=>{ try{ localStorage.setItem('medipredict_mode', mode); }catch(e){} }, [mode]);
+  }), []);
 
   const [loginOpen, setLoginOpen] = useState(false);
   const [user, setUser] = useState(()=>{ try{ return JSON.parse(localStorage.getItem('medipredict_user')) }catch(e){return null} });
@@ -73,9 +68,6 @@ function App(){
           ) : (
             <Button color="inherit" onClick={()=>setLoginOpen(true)}>Sign In</Button>
           )}
-          <IconButton color="inherit" onClick={()=>setMode(mode==='light'?'dark':'light')}>
-            {mode==='light'?<Brightness4Icon/>:<Brightness7Icon/>}
-          </IconButton>
         </Toolbar>
       </AppBar>
       <Box sx={{ bgcolor: 'background.default', color:'text.primary', minHeight:'100vh', pt: 2 }}>
