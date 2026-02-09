@@ -363,11 +363,17 @@ def predict_disease(symptoms):
 
     ai_summary = _gemini_summary(primary, set(normalized), details)
 
+    alerts = []
+    if 'dizziness' in normalized:
+        alerts.append('Dizziness can be caused by low blood pressure. If available, check BP, hydrate, and lie down with legs elevated.')
+        alerts.append('Dizziness can also come from low blood sugar. If diabetic or fasting, take quick carbs (juice/glucose) and monitor.')
+
     return {
         'disease': primary,
         'description': details.get('description', ''),
         'medications': details.get('medications', []),
         'remedies': details.get('remedies', []),
         'ai_summary': ai_summary,
+        'alerts': alerts,
         'candidates': top3,
     }

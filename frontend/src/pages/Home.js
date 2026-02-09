@@ -110,6 +110,12 @@ export default function Home() {
                         <ul style={{ margin: 0, paddingLeft: 18 }}>{prediction.remedies.map((r) => <li key={r}>{r}</li>)}</ul>
                       </Box>
                     )}
+                    {prediction.alerts && prediction.alerts.length > 0 && (
+                      <Box sx={{ mt: 1 }}>
+                        <Typography variant="subtitle2" color="warning.main">Alerts:</Typography>
+                        <ul style={{ margin: 0, paddingLeft: 18 }}>{prediction.alerts.map((a) => <li key={a}>{a}</li>)}</ul>
+                      </Box>
+                    )}
                   </CardContent>
                 </Card>
               </Box>

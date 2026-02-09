@@ -1,6 +1,9 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from .models import Disease
 from .serializers import DiseaseSerializer
 
@@ -47,3 +50,25 @@ def predict(request):
         return Response({'error': 'No matching disease found.'}, status=status.HTTP_200_OK)
 
     return Response({'predictions': results})
+
+
+@api_view(['POST'])
+def register_user(request):
+    data = request.data or {}
+    username = (data.get('username') or '').strip()
+    email = (data.get('email') or '').strip()
+    password = data.get('password') or ''
+
+    if not username or not password:
+        return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if User.objects.filter(username=username).exists():
+        return Response({'error': 'Username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        validate_password(password)
+    except ValidationError as e:
+        return Response({'error': e.messages}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = User.objects.create_user(username=username, email=email, password=password)
+    return Response({'message': 'User created successfully', 'username': user.username, 'email': user.email}, status=status.HTTP_201_CREATED)

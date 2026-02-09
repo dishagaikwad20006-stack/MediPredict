@@ -4,6 +4,7 @@ from . import views
 from .simple_ai_views import simple_predict
 
 urlpatterns = [
+    path('register/', views.register_user, name='register_user'),
     path('diseases/', views.list_diseases, name='list_diseases'),
     path('predict/', views.predict, name='predict'),
     path('simple_predict/', simple_predict, name='simple_predict'),
